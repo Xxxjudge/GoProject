@@ -2,11 +2,12 @@ package main
 
 import (
 	"log"
+	_ "matchers"
 	"os"
 	"search"
 )
 
-func init()  {
+func init() {
 	log.SetOutput(os.Stdout)
 }
 func main() {
