@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	_ "matchers"
+	_ "1/matchers"
 	"os"
-	"search"
+	"1/search"
 )
 
 func init() {

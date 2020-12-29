@@ -1,13 +1,13 @@
 package matchers
 
 import (
+	"1/search"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"regexp"
-	"search"
 )
 
 type (
@@ -50,7 +50,7 @@ type (
 	//rssDocument定义了与rss文档关联的字段
 	rssDocument struct {
 		XMLName xml.Name `xml:"rss"`
-		Chanel  channel  `xml:"chanel"`
+		Channel  channel  `xml:"channel"`
 	}
 )
 
@@ -108,4 +108,33 @@ func (m rssMatcher) Search(feed *search.Feed, searchTerm string) ([]*search.Resu
 	return results, nil
 }
 
+
+
+
 //retrieve发送HTTP Get请求获取rss数据源并解码
+func (m rssMatcher) retrieve(feed *search.Feed) (*rssDocument,error) {
+	if feed.URI=="" {
+		return nil,errors.New("No rss feed URI provided")
+	}
+
+	//从网络获得rss数据源文档
+	resp,err:=http.Get(feed.URI)
+	if err!=nil {
+		return nil, err
+	}
+
+	//一旦从函数返回。关闭返回的响应链接
+	defer resp.Body.Close()
+
+	//检查状态码是不是200，这样就能知道是不是收到了正确的响应
+
+	if resp.StatusCode!=200 {
+		return nil,fmt.Errorf("HTTP Response Error %d\n",resp.StatusCode)
+	}
+
+	//将rss数据源文档解码到我们定义的结构类型里
+	//不需要检查错误，调用者会做这件事
+	var document rssDocument
+	err=xml.NewDecoder(resp.Body).Decode(&document)
+	return &document,err
+}
